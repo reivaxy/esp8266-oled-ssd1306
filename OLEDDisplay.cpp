@@ -545,14 +545,22 @@ void OLEDDisplay::normalDisplay(void) {
   sendCommand(NORMALDISPLAY);
 }
 
-void OLEDDisplay::setContrast(char contrast) {
-  sendCommand(SETCONTRAST);
-  sendCommand(contrast);
+void OLEDDisplay::setContrast(char contrast, char precharge, char comdetect) {
+	sendCommand(SETPRECHARGE); //0xD9
+	sendCommand(precharge); //0xF1 (241) default, to lower the contrast, put 1-1F (1-31)
+	sendCommand(SETCONTRAST);
+	sendCommand(contrast); // 0-255
+	sendCommand(SETVCOMDETECT); //0xDB, (additionally needed to lower the contrast)
+	sendCommand(comdetect); //0x40 64 default, to lower the contrast, put 0
+	sendCommand(DISPLAYALLON_RESUME);
+	sendCommand(NORMALDISPLAY);
+	sendCommand(DISPLAYON);
 }
 
-void OLEDDisplay::flipScreenVertically() {
-  sendCommand(SEGREMAP | 0x01);
-  sendCommand(COMSCANDEC);           //Rotate screen 180 Deg
+void OLEDDisplay::flipScreenVertically(bool mirror, bool turn) {
+  if (!mirror) sendCommand(SEGREMAP | 0x01);
+  if (!turn) sendCommand(COMSCANDEC);           //Rotate screen 180 Deg
+  else sendCommand(COMSCANINC);
 }
 
 void OLEDDisplay::clear(void) {
@@ -680,6 +688,7 @@ void OLEDDisplay::sendInitCommands(void) {
   sendCommand(0x00);
   sendCommand(SEGREMAP);
   sendCommand(COMSCANINC);
+//  sendCommand(COMSCANDEC); //mirror fix for my SSD1305
   sendCommand(SETCOMPINS);
   sendCommand(0x12);
   sendCommand(SETCONTRAST);

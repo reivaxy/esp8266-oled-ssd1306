@@ -201,10 +201,10 @@ class OLEDDisplay : public Print {
     void normalDisplay(void);
 
     // Set display contrast
-    void setContrast(char contrast);
+	void setContrast(char contrast, char precharge = 241, char comdetect = 64);
 
     // Turn the display upside down
-    void flipScreenVertically();
+    void flipScreenVertically(bool mirror = false, bool turn = false);
 
     // Write the buffer to the display memory
     virtual void display(void) = 0;
